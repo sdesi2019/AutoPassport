@@ -43,49 +43,41 @@
     });
   }
 
-  function init() {
-    // Navigation links and behavior
-    const links = document.querySelectorAll('nav a, a.back, td a[href^="#"], .card-link');
+  // Navigation links and behavior
+  const links = document.querySelectorAll('nav a, a.back, td a[href^="#"], .card-link');
 
-    links.forEach(a => {
-      a.addEventListener('click', (e) => {
-        const href = a.getAttribute('href');
-        if (href && href.startsWith('#')) {
-          e.preventDefault();
-          history.pushState(null, '', href);
-          showSection(href);
-        }
-      });
+  links.forEach(a => {
+    a.addEventListener('click', (e) => {
+      const href = a.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        history.pushState(null, '', href);
+        showSection(href);
+      }
     });
+  });
 
-    window.addEventListener('popstate', () => {
-      showSection(location.hash || '#home');
+  window.addEventListener('popstate', () => {
+    showSection(location.hash || '#home');
+  });
+
+  // initialize display according to current hash
+  const hash = location.hash || '#home';
+  showSection(hash);
+
+  // Attach tab handlers
+  attachTabs('driver');
+  attachTabs('vehicle');
+
+  // Image fallback handler: try ASCII filename first; on error fall back to existing Cyrillic filename
+  document.querySelectorAll('img[data-fallback]').forEach(img => {
+    img.addEventListener('error', function onError() {
+      const fallback = this.dataset.fallback;
+      if (fallback && this.src.indexOf(fallback) === -1) {
+        this.removeEventListener('error', onError);
+        this.src = fallback;
+      }
     });
-
-    // initialize display according to current hash
-    const hash = location.hash || '#home';
-    showSection(hash);
-
-    // Attach tab handlers after DOM is ready
-    attachTabs('driver');
-    attachTabs('vehicle');
-
-    // Image fallback handler: try ASCII filename first; on error fall back to existing Cyrillic filename
-    document.querySelectorAll('img[data-fallback]').forEach(img => {
-      img.addEventListener('error', function onError() {
-        const fallback = this.dataset.fallback;
-        if (fallback && this.src.indexOf(fallback) === -1) {
-          this.removeEventListener('error', onError);
-          this.src = fallback;
-        }
-      });
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  });
 
 })();
